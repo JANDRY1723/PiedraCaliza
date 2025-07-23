@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piedra Santa Elena: Tallados en Piedra Caliza</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8; /* Light background */
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .section {
+            padding: 4rem 1rem;
+            min-height: calc(100vh - 80px); /* Adjust for header height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease; /* Smooth transition for background */
+        }
+        /* Default background for home section, can be overridden by JS */
+        #home {
+            background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Default gradient */
+        }
+        .product-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure cards are same height */
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        .product-image-container {
+            width: 100%;
+            height: 200px; /* Fixed height for image container */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the container */
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 2.5rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #666;
+            text-decoration: none;
+        }
+        .admin-product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .admin-product-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 1rem;
+        }
+        .admin-product-item .actions button {
+            margin-left: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .admin-product-item .actions .edit-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        .admin-product-item .actions .edit-btn:hover {
+            background-color: #45a049;
+        }
+        .admin-product-item .actions .delete-btn {
+            background-color: #f44336; /* Red */
+            color: white;
+        }
+        .admin-product-item .actions .delete-btn:hover {
+            background-color: #da190b;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group input[type="color"] { /* Added color input styling */
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Include padding in width */
+            transition: border-color 0.2s;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus,
+        .form-group textarea:focus,
+        .form-group input[type="color"]:focus { /* Added color input styling */
+            outline: none;
+            border-color: #6366f1; /* Indigo focus */
+        }
+        .btn-primary {
+            background-color: #6366f1; /* Indigo */
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #4f46e5; /* Darker Indigo */
+        }
+        .btn-secondary {
+            background-color: #e2e8f0; /* Light gray */
+            color: #475569; /* Slate */
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1; /* Darker light gray */
+        }
+        .message-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            text-align: center;
+        }
+        .message-box button {
+            margin-top: 1rem;
+        }
+        .product-detail-modal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .product-detail-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.5rem;
+            max-height: 200px; /* Limit height for image grid */
+            overflow-y: auto;
+            padding-right: 5px; /* For scrollbar */
+        }
+        .product-detail-images img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .product-detail-images img:hover {
+            transform: scale(1.05);
+        }
+        .product-detail-main-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain; /* Ensure full image is visible */
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md py-4 sticky top-0 z-50">
+        <div class="container flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/80x80/f0f0f0/333?text=JP" alt="JP Logo" class="h-16 w-16 rounded-full mr-3" id="logo-img">
+                <h1 class="text-3xl font-bold text-indigo-600">Piedra Santa Elena</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#home" class="text-lg font-medium text-gray-600 hover:text-indigo-600 transition duration-300">Inicio</a></li>
+                    <li><a href="#products" class="text-lg font-medium text-gray-600 hover:text-indigo-600 transition duration-300">Productos</a></li>
+                    <li><a href="#about" class="text-lg font-medium text-gray-600 hover:text-indigo-600 transition duration-300">Nosotros</a></li>
+                    <li><a href="#contact" class="text-lg font-medium text-gray-600 hover:text-indigo-600 transition duration-300">Contacto</a></li>
+                    <li><a href="#" id="admin-link" class="text-lg font-medium text-gray-600 hover:text-indigo-600 transition duration-300">Administrar</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="section text-white">
+        <div class="container">
+            <h2 class="text-5xl font-extrabold mb-6 leading-tight">Tallados Artesanales en Piedra Caliza</h2>
+            <p class="text-xl mb-10 max-w-2xl">Transformando la piedra en arte para embellecer tus espacios. Descubre la belleza natural y la durabilidad de nuestros trabajos.</p>
+            <div class="flex space-x-4">
+                <a href="#products" class="btn-primary text-white bg-indigo-700 hover:bg-indigo-800 px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition duration-300">Ver Productos</a>
+                <a href="#contact" class="btn-secondary bg-white text-indigo-700 hover:bg-gray-100 px-8 py-3 rounded-full text-lg font-semibold shadow-lg transition duration-300">Contactar</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="section bg-gray-50">
+        <div class="container">
+            <h2 class="text-4xl font-bold text-indigo-700 mb-12">Nuestros Productos</h2>
+            <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                <!-- Products will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="section bg-white">
+        <div class="container">
+            <h2 class="text-4xl font-bold text-indigo-700 mb-8">Sobre Nosotros</h2>
+            <p class="text-lg max-w-3xl leading-relaxed text-gray-700" id="about-us-content">
+                En Piedra Santa Elena, somos artesanos apasionados por la belleza y la versatilidad de la piedra caliza. Con años de experiencia, nos dedicamos a crear piezas únicas y duraderas que realzan cualquier ambiente. Desde revestimientos elegantes hasta detalles decorativos, cada tallado es una obra de arte que refleja la dedicación y el cuidado de nuestras manos. Nos enorgullece ofrecer productos de la más alta calidad, combinando técnicas tradicionales con diseños innovadores para satisfacer las necesidades de nuestros clientes.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section bg-gray-50">
+        <div class="container">
+            <h2 class="text-4xl font-bold text-indigo-700 mb-8">Contáctanos</h2>
+            <p class="text-lg mb-8 max-w-xl text-gray-700">Estamos listos para ayudarte a transformar tus ideas en realidad. Contáctanos para cotizaciones o cualquier consulta.</p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-10">
+                <a href="#" id="whatsapp-link" target="_blank" class="flex items-center text-green-600 hover:text-green-700 transition duration-300 text-xl font-semibold">
+                    <i class="fab fa-whatsapp text-3xl mr-3"></i> <span id="whatsapp-number">0997375268</span>
+                </a>
+                <a href="#" id="facebook-link" target="_blank" class="flex items-center text-blue-700 hover:text-blue-800 transition duration-300 text-xl font-semibold">
+                    <i class="fab fa-facebook text-3xl mr-3"></i> <span id="facebook-name">Trabajos en Piedra Caliza</span>
+                </a>
+                <a href="#" id="instagram-link" target="_blank" class="flex items-center text-pink-600 hover:text-pink-700 transition duration-300 text-xl font-semibold">
+                    <i class="fab fa-instagram text-3xl mr-3"></i> <span id="instagram-handle">@piedrasantaelena</span>
+                </a>
+            </div>
+            <p class="text-lg mt-8 text-gray-700" id="email-address">O escríbenos a: info@piedrasantaelena.com</p>
+        </div>
+    </section>
+
+    <!-- Admin Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('login-modal')">&times;</span>
+            <h2 class="text-3xl font-bold text-indigo-700 mb-8">Acceso de Administrador</h2>
+            <form id="login-form" class="space-y-6">
+                <div class="form-group">
+                    <label for="username">Usuario:</label>
+                    <input type="text" id="username" name="username" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                </div>
+                <button type="submit" class="btn-primary w-full">Iniciar Sesión</button>
+                <p id="login-message" class="text-red-500 text-sm mt-2"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Section -->
+    <section id="admin-panel" class="section bg-white hidden">
+        <div class="container text-left w-full">
+            <h2 class="text-4xl font-bold text-indigo-700 mb-8">Panel de Administración</h2>
+            <button id="logout-btn" class="btn-secondary mb-8">Cerrar Sesión</button>
+
+            <!-- Admin Tabs -->
+            <div class="flex border-b border-gray-200 mb-8">
+                <button class="px-6 py-3 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-700 transition duration-300 admin-tab-btn active" data-tab="manage-products">Gestionar Productos</button>
+                <button class="px-6 py-3 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-700 transition duration-300 admin-tab-btn" data-tab="edit-about">Editar "Sobre Nosotros"</button>
+                <button class="px-6 py-3 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-700 transition duration-300 admin-tab-btn" data-tab="edit-contact">Editar Contacto</button>
+                <button class="px-6 py-3 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-700 transition duration-300 admin-tab-btn" data-tab="edit-logo">Editar Logo</button>
+                <button class="px-6 py-3 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-700 transition duration-300 admin-tab-btn" data-tab="edit-styles">Editar Estilos</button>
+            </div>
+
+            <!-- Manage Products Tab Content -->
+            <div id="manage-products" class="admin-tab-content active">
+                <h3 class="text-3xl font-bold text-indigo-600 mb-6">Gestionar Productos</h3>
+
+                <button id="add-product-btn" class="btn-primary mb-6">Añadir Nuevo Producto</button>
+
+                <div id="admin-product-list" class="space-y-4">
+                    <!-- Admin products will be listed here -->
+                </div>
+            </div>
+
+            <!-- Edit About Us Tab Content -->
+            <div id="edit-about" class="admin-tab-content hidden">
+                <h3 class="text-3xl font-bold text-indigo-600 mb-6">Editar "Sobre Nosotros"</h3>
+                <form id="edit-about-form" class="space-y-6">
+                    <div class="form-group">
+                        <label for="about-us-textarea">Contenido de "Sobre Nosotros":</label>
+                        <textarea id="about-us-textarea" class="w-full p-3 border border-gray-300 rounded-lg" rows="10" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    <p id="about-us-message" class="text-green-600 text-sm mt-2"></p>
+                </form>
+            </div>
+
+            <!-- Edit Contact Tab Content -->
+            <div id="edit-contact" class="admin-tab-content hidden">
+                <h3 class="text-3xl font-bold text-indigo-600 mb-6">Editar Contacto</h3>
+                <form id="edit-contact-form" class="space-y-6">
+                    <div class="form-group">
+                        <label for="contact-whatsapp">Número de WhatsApp (con código de país, ej. +593997375268):</label>
+                        <input type="text" id="contact-whatsapp" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-facebook">Nombre de Facebook (ej. Trabajos en Piedra Caliza):</label>
+                        <input type="text" id="contact-facebook" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-facebook-url">URL de Facebook (ej. https://www.facebook.com/tupagina):</label>
+                        <input type="text" id="contact-facebook-url" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-instagram">Usuario de Instagram (ej. @piedrasantaelena):</label>
+                        <input type="text" id="contact-instagram" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-instagram-url">URL de Instagram (ej. https://www.instagram.com/tuusuario):</label>
+                        <input type="text" id="contact-instagram-url" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Correo Electrónico:</label>
+                        <input type="email" id="contact-email" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    <p id="contact-message" class="text-green-600 text-sm mt-2"></p>
+                </form>
+            </div>
+
+            <!-- Edit Logo Tab Content -->
+            <div id="edit-logo" class="admin-tab-content hidden">
+                <h3 class="text-3xl font-bold text-indigo-600 mb-6">Editar Logo</h3>
+                <form id="edit-logo-form" class="space-y-6">
+                    <div class="form-group">
+                        <label for="logo-url">URL del Logo (ej. https://ejemplo.com/tu-logo.png):</label>
+                        <input type="text" id="logo-url" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-gray-600 mb-2">Previsualización del Logo:</p>
+                        <img id="logo-preview" src="https://placehold.co/80x80/f0f0f0/333?text=JP" alt="Logo Preview" class="h-24 w-24 rounded-full object-cover">
+                    </div>
+                    <button type="submit" class="btn-primary">Guardar Logo</button>
+                    <p id="logo-message" class="text-green-600 text-sm mt-2"></p>
+                </form>
+            </div>
+
+            <!-- Edit Styles Tab Content -->
+            <div id="edit-styles" class="admin-tab-content hidden">
+                <h3 class="text-3xl font-bold text-indigo-600 mb-6">Editar Estilos de la Página</h3>
+                <form id="edit-styles-form" class="space-y-6">
+                    <div class="form-group">
+                        <label for="home-bg-image">URL de Imagen de Fondo para Inicio (dejar vacío para gradiente por defecto):</label>
+                        <input type="text" id="home-bg-image" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="https://ejemplo.com/fondo-inicio.jpg">
+                        <p class="text-sm text-gray-500 mt-1">Sube tu imagen a un servicio de hosting de imágenes y pega la URL aquí.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="body-bg-color">Color de Fondo Principal (ej. #f8f8f8 o lightgray):</label>
+                        <input type="text" id="body-bg-color" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="#f8f8f8">
+                        <input type="color" id="body-bg-color-picker" class="w-full h-10 mt-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="body-text-color">Color de Texto Principal (ej. #333 o black):</label>
+                        <input type="text" id="body-text-color" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="#333">
+                        <input type="color" id="body-text-color-picker" class="w-full h-10 mt-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="primary-btn-color">Color de Botones Primarios (ej. #6366f1 o indigo-500):</label>
+                        <input type="text" id="primary-btn-color" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="#6366f1">
+                        <input type="color" id="primary-btn-color-picker" class="w-full h-10 mt-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="secondary-btn-color">Color de Botones Secundarios (ej. #e2e8f0 o gray-200):</label>
+                        <input type="text" id="secondary-btn-color" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="#e2e8f0">
+                        <input type="color" id="secondary-btn-color-picker" class="w-full h-10 mt-2">
+                    </div>
+                    <button type="submit" class="btn-primary">Aplicar Estilos</button>
+                    <p id="styles-message" class="text-green-600 text-sm mt-2"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add/Edit Product Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('product-modal')">&times;</span>
+            <h2 class="text-3xl font-bold text-indigo-700 mb-8" id="product-modal-title">Añadir Nuevo Producto</h2>
+            <form id="product-form" class="space-y-6">
+                <input type="hidden" id="product-id">
+                <div class="form-group">
+                    <label for="product-name">Nombre del Producto:</label>
+                    <input type="text" id="product-name" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-description">Descripción:</label>
+                    <textarea id="product-description" class="w-full p-3 border border-gray-300 rounded-lg" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product-price">Precio (opcional, ej. 150.00):</label>
+                    <input type="number" id="product-price" class="w-full p-3 border border-gray-300 rounded-lg" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="product-images">URLs de Imágenes (separadas por coma):</label>
+                    <input type="text" id="product-images" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="https://imagen1.jpg, https://imagen2.jpg" required>
+                    <p class="text-sm text-gray-500 mt-1">Sube tus imágenes a un servicio como Imgur o a tu repositorio de GitHub y pega las URLs aquí.</p>
+                </div>
+                <button type="submit" class="btn-primary w-full">Guardar Producto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-detail-modal" class="modal">
+        <div class="modal-content product-detail-modal-content">
+            <span class="close-button" onclick="closeModal('product-detail-modal')">&times;</span>
+            <img id="detail-main-image" src="" alt="Imagen principal del producto" class="product-detail-main-image">
+            <div id="detail-thumbnail-container" class="product-detail-images">
+                <!-- Thumbnails will be loaded here -->
+            </div>
+            <h2 class="text-3xl font-bold text-indigo-700" id="detail-product-name"></h2>
+            <p class="text-gray-700 text-lg" id="detail-product-description"></p>
+            <p class="text-indigo-600 text-2xl font-bold" id="detail-product-price"></p>
+            <a href="#" id="detail-buy-button" target="_blank" class="btn-primary w-full text-center">Comprar por WhatsApp</a>
+        </div>
+    </div>
+
+    <!-- Message Box -->
+    <div id="message-box" class="message-box hidden">
+        <p id="message-text" class="text-lg font-medium mb-4"></p>
+        <button onclick="hideMessageBox()" class="btn-primary">Aceptar</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Piedra Santa Elena. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#home" class="hover:text-indigo-400 transition duration-300">Inicio</a>
+                <a href="#products" class="hover:text-indigo-400 transition duration-300">Productos</a>
+                <a href="#contact" class="hover:text-indigo-400 transition duration-300">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Global State and Constants ---
+        const USERNAME = 'admin'; // Usuario de administración
+        const PASSWORD = 'password123'; // Contraseña de administración (¡Cambia esto para tu sitio real!)
+
+        let isLoggedIn = false;
+
+        // Default data (will be overwritten by localStorage if available)
+        let products = JSON.parse(localStorage.getItem('products')) || [
+            { id: 'prod1', name: 'Revestimiento Clásico', description: 'Tallado de piedra caliza para revestimientos de paredes interiores y exteriores, con acabado rústico y natural.', price: 45.00, images: ['https://placehold.co/600x400/DCC5AE/333?text=Revestimiento+1', 'https://placehold.co/600x400/DCC5AE/333?text=Revestimiento+2'] },
+            { id: 'prod2', name: 'Piso Artesanal', description: 'Losas de piedra caliza cortadas y pulidas a mano, ideales para patios, piscinas y caminos, ofreciendo durabilidad y belleza.', price: 60.00, images: ['https://placehold.co/600x400/DCC5AE/333?text=Piso+1', 'https://placehold.co/600x400/DCC5AE/333?text=Piso+2'] },
+            { id: 'prod3', name: 'Detalle Decorativo', description: 'Pequeñas piezas talladas para decoración, como marcos de ventanas, fuentes o elementos de jardín, con diseños personalizados.', price: 120.00, images: ['https://placehold.co/600x400/DCC5AE/333?text=Decorativo+1', 'https://placehold.co/600x400/DCC5AE/333?text=Decorativo+2'] }
+        ];
+
+        let aboutUsContent = localStorage.getItem('aboutUsContent') || `
+            En Piedra Santa Elena, somos artesanos apasionados por la belleza y la versatilidad de la piedra caliza. Con años de experiencia, nos dedicamos a crear piezas únicas y duraderas que realzan cualquier ambiente. Desde revestimientos elegantes hasta detalles decorativos, cada tallado es una obra de arte que refleja la dedicación y el cuidado de nuestras manos. Nos enorgullece ofrecer productos de la más alta calidad, combinando técnicas tradicionales con diseños innovadores para satisfacer las necesidades de nuestros clientes.
+        `;
+
+        let contactInfo = JSON.parse(localStorage.getItem('contactInfo')) || {
+            whatsappNumber: '593997375268', // Without '+' for WhatsApp link
+            facebookName: 'Trabajos en Piedra Caliza',
+            facebookUrl: 'https://www.facebook.com/PiedraSantaElenaOficial', // Example URL
+            instagramHandle: '@piedrasantaelena',
+            instagramUrl: 'https://www.instagram.com/piedrasantaelena', // Example URL
+            email: 'info@piedrasantaelena.com'
+        };
+
+        let logoUrl = localStorage.getItem('logoUrl') || 'https://placehold.co/80x80/f0f0f0/333?text=JP';
+
+        let styles = JSON.parse(localStorage.getItem('styles')) || {
+            homeBgImage: '', // URL for background image
+            bodyBgColor: '#f8f8f8',
+            bodyTextColor: '#333',
+            primaryBtnColor: '#6366f1',
+            secondaryBtnColor: '#e2e8f0'
+        };
+
+        // --- DOM Elements ---
+        const productListDiv = document.getElementById('product-list');
+        const adminProductListDiv = document.getElementById('admin-product-list');
+        const loginModal = document.getElementById('login-modal');
+        const productModal = document.getElementById('product-modal');
+        const productDetailModal = document.getElementById('product-detail-modal');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const productForm = document.getElementById('product-form');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        const aboutUsTextarea = document.getElementById('about-us-textarea');
+        const editAboutForm = document.getElementById('edit-about-form');
+        const aboutUsContentDisplay = document.getElementById('about-us-content');
+
+        const contactWhatsappInput = document.getElementById('contact-whatsapp');
+        const contactFacebookInput = document.getElementById('contact-facebook');
+        const contactFacebookUrlInput = document.getElementById('contact-facebook-url');
+        const contactInstagramInput = document.getElementById('contact-instagram');
+        const contactInstagramUrlInput = document.getElementById('contact-instagram-url');
+        const contactEmailInput = document.getElementById('contact-email');
+        const editContactForm = document.getElementById('edit-contact-form');
+
+        const whatsappLink = document.getElementById('whatsapp-link');
+        const whatsappNumberDisplay = document.getElementById('whatsapp-number');
+        const facebookLink = document.getElementById('facebook-link');
+        const facebookNameDisplay = document.getElementById('facebook-name');
+        const instagramLink = document.getElementById('instagram-link');
+        const instagramHandleDisplay = document.getElementById('instagram-handle');
+        const emailAddressDisplay = document.getElementById('email-address');
+
+        const logoUrlInput = document.getElementById('logo-url');
+        const logoPreview = document.getElementById('logo-preview');
+        const logoImg = document.getElementById('logo-img');
+        const editLogoForm = document.getElementById('edit-logo-form');
+
+        // Style editing elements
+        const homeBgImageInput = document.getElementById('home-bg-image');
+        const bodyBgColorInput = document.getElementById('body-bg-color');
+        const bodyBgColorPicker = document.getElementById('body-bg-color-picker');
+        const bodyTextColorInput = document.getElementById('body-text-color');
+        const bodyTextColorPicker = document.getElementById('body-text-color-picker');
+        const primaryBtnColorInput = document.getElementById('primary-btn-color');
+        const primaryBtnColorPicker = document.getElementById('primary-btn-color-picker');
+        const secondaryBtnColorInput = document.getElementById('secondary-btn-color');
+        const secondaryBtnColorPicker = document.getElementById('secondary-btn-color-picker');
+        const editStylesForm = document.getElementById('edit-styles-form');
+        const homeSection = document.getElementById('home');
+
+
+        // --- Utility Functions ---
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+        }
+
+        function hideMessageBox() {
+            messageBox.style.display = 'none';
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function generateUniqueId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function saveProducts() {
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        function saveAboutUsContent() {
+            localStorage.setItem('aboutUsContent', aboutUsContent);
+        }
+
+        function saveContactInfo() {
+            localStorage.setItem('contactInfo', JSON.stringify(contactInfo));
+        }
+
+        function saveLogoUrl() {
+            localStorage.setItem('logoUrl', logoUrl);
+        }
+
+        function saveStyles() {
+            localStorage.setItem('styles', JSON.stringify(styles));
+        }
+
+        // --- Render Functions ---
+        function renderProducts() {
+            productListDiv.innerHTML = '';
+            if (products.length === 0) {
+                productListDiv.innerHTML = '<p class="text-xl text-gray-600">No hay productos disponibles en este momento. ¡Pronto tendremos novedades!</p>';
+                return;
+            }
+            products.forEach(product => {
+                const productCard = `
+                    <div class="product-card cursor-pointer" data-id="${product.id}">
+                        <div class="product-image-container">
+                            <img src="${product.images[0] || 'https://placehold.co/400x300/f0f0f0/333?text=Sin+Imagen'}" alt="${product.name}" class="product-image">
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-2xl font-semibold text-indigo-700 mb-2">${product.name}</h3>
+                                <p class="text-gray-600 text-base mb-4 line-clamp-3">${product.description}</p>
+                            </div>
+                            <div class="mt-auto">
+                                <p class="text-indigo-600 text-xl font-bold mb-4">${product.price ? `$${product.price.toFixed(2)}` : 'Consultar Precio'}</p>
+                                <button class="btn-primary w-full view-detail-btn" data-id="${product.id}">Ver Detalles</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productListDiv.insertAdjacentHTML('beforeend', productCard);
+            });
+
+            // Add event listeners for detail buttons
+            document.querySelectorAll('.view-detail-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.target.dataset.id;
+                    showProductDetail(productId);
+                });
+            });
+        }
+
+        function renderAdminProducts() {
+            adminProductListDiv.innerHTML = '';
+            if (products.length === 0) {
+                adminProductListDiv.innerHTML = '<p class="text-gray-600">No hay productos para gestionar.</p>';
+                return;
+            }
+            products.forEach(product => {
+                const adminProductItem = `
+                    <div class="admin-product-item">
+                        <div class="flex items-center flex-grow">
+                            <img src="${product.images[0] || 'https://placehold.co/80x80/f0f0f0/333?text=No+Img'}" alt="${product.name}">
+                            <span class="text-lg font-medium">${product.name}</span>
+                        </div>
+                        <div class="actions">
+                            <button class="edit-btn" data-id="${product.id}">Editar</button>
+                            <button class="delete-btn" data-id="${product.id}">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                adminProductListDiv.insertAdjacentHTML('beforeend', adminProductItem);
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.target.dataset.id;
+                    editProduct(productId);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.target.dataset.id;
+                    deleteProduct(productId);
+                });
+            });
+        }
+
+        function updateAboutUsDisplay() {
+            aboutUsContentDisplay.innerHTML = aboutUsContent.replace(/\n/g, '<br>');
+            aboutUsTextarea.value = aboutUsContent;
+        }
+
+        function updateContactDisplay() {
+            whatsappNumberDisplay.textContent = contactInfo.whatsappNumber;
+            whatsappLink.href = `https://wa.me/${contactInfo.whatsappNumber}`;
+            facebookNameDisplay.textContent = contactInfo.facebookName;
+            facebookLink.href = contactInfo.facebookUrl;
+            instagramHandleDisplay.textContent = contactInfo.instagramHandle;
+            instagramLink.href = contactInfo.instagramUrl;
+            emailAddressDisplay.textContent = `O escríbenos a: ${contactInfo.email}`;
+
+            // Set admin form values
+            contactWhatsappInput.value = contactInfo.whatsappNumber;
+            contactFacebookInput.value = contactInfo.facebookName;
+            contactFacebookUrlInput.value = contactInfo.facebookUrl;
+            contactInstagramInput.value = contactInfo.instagramHandle;
+            contactInstagramUrlInput.value = contactInfo.instagramUrl;
+            contactEmailInput.value = contactInfo.email;
+        }
+
+        function updateLogoDisplay() {
+            logoImg.src = logoUrl;
+            logoPreview.src = logoUrl;
+            logoUrlInput.value = logoUrl;
+        }
+
+        function applyStyles() {
+            // Apply body background color
+            document.body.style.backgroundColor = styles.bodyBgColor;
+            // Apply body text color
+            document.body.style.color = styles.bodyTextColor;
+
+            // Apply home section background image or gradient
+            if (styles.homeBgImage) {
+                homeSection.style.backgroundImage = `url('${styles.homeBgImage}')`;
+            } else {
+                homeSection.style.backgroundImage = `linear-gradient(to right, #6366f1, #8b5cf6)`; // Default gradient
+            }
+
+            // Apply primary button color
+            document.documentElement.style.setProperty('--primary-btn-color', styles.primaryBtnColor);
+            document.querySelectorAll('.btn-primary').forEach(btn => {
+                // Remove existing Tailwind background classes if any
+                btn.classList.forEach(cls => {
+                    if (cls.startsWith('bg-') || cls.startsWith('hover:bg-')) {
+                        btn.classList.remove(cls);
+                    }
+                });
+                btn.style.backgroundColor = styles.primaryBtnColor;
+                // For hover effect, we'll just use a slightly darker shade
+                btn.onmouseover = () => btn.style.backgroundColor = darkenColor(styles.primaryBtnColor, -10);
+                btn.onmouseout = () => btn.style.backgroundColor = styles.primaryBtnColor;
+            });
+
+            // Apply secondary button color
+            document.documentElement.style.setProperty('--secondary-btn-color', styles.secondaryBtnColor);
+            document.querySelectorAll('.btn-secondary').forEach(btn => {
+                // Remove existing Tailwind background classes if any
+                btn.classList.forEach(cls => {
+                    if (cls.startsWith('bg-') || cls.startsWith('hover:bg-')) {
+                        btn.classList.remove(cls);
+                    }
+                });
+                btn.style.backgroundColor = styles.secondaryBtnColor;
+                // For hover effect, we'll just use a slightly darker shade
+                btn.onmouseover = () => btn.style.backgroundColor = darkenColor(styles.secondaryBtnColor, -10);
+                btn.onmouseout = () => btn.style.backgroundColor = styles.secondaryBtnColor;
+            });
+
+            // Update admin form values
+            homeBgImageInput.value = styles.homeBgImage;
+            bodyBgColorInput.value = styles.bodyBgColor;
+            bodyBgColorPicker.value = styles.bodyBgColor;
+            bodyTextColorInput.value = styles.bodyTextColor;
+            bodyTextColorPicker.value = styles.bodyTextColor;
+            primaryBtnColorInput.value = styles.primaryBtnColor;
+            primaryBtnColorPicker.value = styles.primaryBtnColor;
+            secondaryBtnColorInput.value = styles.secondaryBtnColor;
+            secondaryBtnColorPicker.value = styles.secondaryBtnColor;
+        }
+
+        // Helper function to darken/lighten a color
+        function darkenColor(hex, percent) {
+            // strip # if it's there
+            hex = hex.replace(/^\s*#|\s*$/g, '');
+
+            // convert 3 char codes to 6, e.g. `E0F` to `EE00FF`
+            if (hex.length === 3) {
+                hex = hex.split('').map(function (char) {
+                    return char + char;
+                }).join('');
+            }
+
+            var r = parseInt(hex.substr(0, 2), 16),
+                g = parseInt(hex.substr(2, 2), 16),
+                b = parseInt(hex.substr(4, 2), 16);
+
+            return '#' +
+               ((0 | (1 << 8) + r + (256 - r) * percent / 100).toString(16)).substr(1) +
+               ((0 | (1 << 8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
+               ((0 | (1 << 8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
+        }
+
+
+        // --- Product Management Functions ---
+        function addOrUpdateProduct(event) {
+            event.preventDefault();
+            const id = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value;
+            const description = document.getElementById('product-description').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const imagesString = document.getElementById('product-images').value;
+            const images = imagesString.split(',').map(url => url.trim()).filter(url => url !== '');
+
+            if (id) {
+                // Update existing product
+                const productIndex = products.findIndex(p => p.id === id);
+                if (productIndex > -1) {
+                    products[productIndex] = { id, name, description, price, images };
+                    showMessageBox('Producto actualizado con éxito.');
+                }
+            } else {
+                // Add new product
+                const newProduct = { id: generateUniqueId(), name, description, price, images };
+                products.push(newProduct);
+                showMessageBox('Producto añadido con éxito.');
+            }
+            saveProducts();
+            renderProducts();
+            renderAdminProducts();
+            closeModal('product-modal');
+            productForm.reset();
+        }
+
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                document.getElementById('product-modal-title').textContent = 'Editar Producto';
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-description').value = product.description;
+                document.getElementById('product-price').value = product.price || '';
+                document.getElementById('product-images').value = product.images.join(', ');
+                openModal('product-modal');
+            }
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                products = products.filter(p => p.id !== productId);
+                saveProducts();
+                renderProducts();
+                renderAdminProducts();
+                showMessageBox('Producto eliminado.');
+            }
+        }
+
+        function showProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                document.getElementById('detail-product-name').textContent = product.name;
+                document.getElementById('detail-product-description').textContent = product.description;
+                document.getElementById('detail-product-price').textContent = product.price ? `$${product.price.toFixed(2)}` : 'Consultar Precio';
+                document.getElementById('detail-buy-button').href = `https://wa.me/${contactInfo.whatsappNumber}?text=Hola%2C%20estoy%20interesado%20en%20el%20producto%3A%20${encodeURIComponent(product.name)}`;
+
+                const mainImage = document.getElementById('detail-main-image');
+                const thumbnailContainer = document.getElementById('detail-thumbnail-container');
+                thumbnailContainer.innerHTML = '';
+
+                if (product.images && product.images.length > 0) {
+                    mainImage.src = product.images[0];
+                    product.images.forEach(imgUrl => {
+                        const thumbnail = document.createElement('img');
+                        thumbnail.src = imgUrl;
+                        thumbnail.alt = product.name;
+                        thumbnail.classList.add('cursor-pointer', 'rounded-lg', 'object-cover', 'h-24', 'w-full');
+                        thumbnail.addEventListener('click', () => {
+                            mainImage.src = imgUrl;
+                        });
+                        thumbnailContainer.appendChild(thumbnail);
+                    });
+                } else {
+                    mainImage.src = 'https://placehold.co/600x400/f0f0f0/333?text=Sin+Imagen';
+                    thumbnailContainer.innerHTML = '<p class="text-gray-500">No hay imágenes adicionales.</p>';
+                }
+
+                openModal('product-detail-modal');
+            }
+        }
+
+        // --- Admin Panel Logic ---
+        function checkLoginStatus() {
+            isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                adminPanel.classList.remove('hidden');
+                document.getElementById('admin-link').textContent = 'Administrar';
+            } else {
+                adminPanel.classList.add('hidden');
+                document.getElementById('admin-link').textContent = 'Administrar'; // Reset text
+            }
+        }
+
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginMessage = document.getElementById('login-message');
+
+            // --- Debugging Logs ---
+            console.log('Attempting login...');
+            console.log('Entered Username:', username);
+            console.log('Entered Password:', password);
+            console.log('Expected Username:', USERNAME);
+            console.log('Expected Password:', PASSWORD);
+            // --- End Debugging Logs ---
+
+            if (username === USERNAME && password === PASSWORD) {
+                console.log('Login successful!');
+                localStorage.setItem('isLoggedIn', 'true');
+                isLoggedIn = true;
+                closeModal('login-modal');
+                adminPanel.classList.remove('hidden');
+                loginMessage.textContent = '';
+                showMessageBox('Sesión iniciada con éxito. ¡Bienvenido al panel de administración!');
+                // Activate default tab
+                showAdminTab('manage-products');
+            } else {
+                console.log('Login failed: Incorrect credentials.');
+                loginMessage.textContent = 'Usuario o contraseña incorrectos.';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            isLoggedIn = false;
+            adminPanel.classList.add('hidden');
+            showMessageBox('Sesión cerrada.');
+            // Redirect to home or refresh public view
+            window.location.hash = '#home';
+            checkLoginStatus(); // Update admin link text
+        }
+
+        function showAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-indigo-500', 'text-indigo-700');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+            document.querySelector(`.admin-tab-btn[data-tab="${tabId}"]`).classList.add('active', 'border-indigo-500', 'text-indigo-700');
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            renderAdminProducts();
+            updateAboutUsDisplay();
+            updateContactDisplay();
+            updateLogoDisplay();
+            applyStyles(); // Apply styles on load
+            checkLoginStatus(); // Check login status on page load
+
+            // Navigation links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Handle the admin link separately
+                    if (link.id === 'admin-link') {
+                        if (!isLoggedIn) {
+                            openModal('login-modal');
+                        } else {
+                            // Already logged in, just show admin panel
+                            document.getElementById('admin-panel').scrollIntoView({ behavior: 'smooth' });
+                            showAdminTab('manage-products'); // Default to manage products tab
+                        }
+                    } else {
+                        // For other navigation links, scroll to the target section
+                        const targetId = e.target.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) { // Ensure the element exists before scrolling
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                            // Hide admin panel if navigating away from it
+                            adminPanel.classList.add('hidden');
+                        } else {
+                            console.error('Target element not found for ID:', targetId);
+                        }
+                    }
+                });
+            });
+
+            // Admin tab buttons
+            document.querySelectorAll('.admin-tab-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const tabId = e.target.dataset.tab;
+                    showAdminTab(tabId);
+                });
+            });
+
+            // Admin login/logout
+            loginForm.addEventListener('submit', login);
+            logoutBtn.addEventListener('click', logout);
+
+            // Add product button
+            addProductBtn.addEventListener('click', () => {
+                document.getElementById('product-modal-title').textContent = 'Añadir Nuevo Producto';
+                productForm.reset();
+                document.getElementById('product-id').value = ''; // Clear ID for new product
+                openModal('product-modal');
+            });
+
+            // Product form submission
+            productForm.addEventListener('submit', addOrUpdateProduct);
+
+            // Edit About Us form submission
+            editAboutForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                aboutUsContent = aboutUsTextarea.value;
+                saveAboutUsContent();
+                updateAboutUsDisplay();
+                document.getElementById('about-us-message').textContent = 'Contenido "Sobre Nosotros" guardado con éxito.';
+                setTimeout(() => document.getElementById('about-us-message').textContent = '', 3000);
+            });
+
+            // Edit Contact form submission
+            editContactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                contactInfo.whatsappNumber = contactWhatsappInput.value.replace(/\D/g, ''); // Remove non-digits for clean number
+                contactInfo.facebookName = contactFacebookInput.value;
+                contactInfo.facebookUrl = contactFacebookUrlInput.value;
+                contactInfo.instagramHandle = contactInstagramInput.value;
+                contactInfo.instagramUrl = contactInstagramUrlInput.value;
+                contactInfo.email = contactEmailInput.value;
+                saveContactInfo();
+                updateContactDisplay();
+                document.getElementById('contact-message').textContent = 'Información de contacto guardada con éxito.';
+                setTimeout(() => document.getElementById('contact-message').textContent = '', 3000);
+            });
+
+            // Edit Logo form submission
+            editLogoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                logoUrl = logoUrlInput.value;
+                saveLogoUrl();
+                updateLogoDisplay();
+                document.getElementById('logo-message').textContent = 'Logo actualizado con éxito.';
+                setTimeout(() => document.getElementById('logo-message').textContent = '', 3000);
+            });
+
+            // Logo preview on input change
+            logoUrlInput.addEventListener('input', () => {
+                logoPreview.src = logoUrlInput.value || 'https://placehold.co/80x80/f0f0f0/333?text=JP';
+            });
+
+            // Style form submission
+            editStylesForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                styles.homeBgImage = homeBgImageInput.value;
+                styles.bodyBgColor = bodyBgColorInput.value;
+                styles.bodyTextColor = bodyTextColorInput.value;
+                styles.primaryBtnColor = primaryBtnColorInput.value;
+                styles.secondaryBtnColor = secondaryBtnColorInput.value;
+                saveStyles();
+                applyStyles();
+                document.getElementById('styles-message').textContent = 'Estilos aplicados con éxito.';
+                setTimeout(() => document.getElementById('styles-message').textContent = '', 3000);
+            });
+
+            // Color picker synchronization
+            bodyBgColorPicker.addEventListener('input', (e) => bodyBgColorInput.value = e.target.value);
+            bodyTextColorPicker.addEventListener('input', (e) => bodyTextColorInput.value = e.target.value);
+            primaryBtnColorPicker.addEventListener('input', (e) => primaryBtnColorInput.value = e.target.value);
+            secondaryBtnColorPicker.addEventListener('input', (e) => secondaryBtnColorInput.value = e.target.value);
+
+            // Text input synchronization for color pickers
+            bodyBgColorInput.addEventListener('input', (e) => {
+                try { bodyBgColorPicker.value = e.target.value; } catch (e) { /* ignore invalid color input */ }
+            });
+            bodyTextColorInput.addEventListener('input', (e) => {
+                try { bodyTextColorPicker.value = e.target.value; } catch (e) { /* ignore invalid color input */ }
+            });
+            primaryBtnColorInput.addEventListener('input', (e) => {
+                try { primaryBtnColorPicker.value = e.target.value; } catch (e) { /* ignore invalid color input */ }
+            });
+            secondaryBtnColorInput.addEventListener('input', (e) => {
+                try { secondaryBtnColorPicker.value = e.target.value; } catch (e) { /* ignore invalid color input */ }
+            });
+        });
+
+        // Close modal when clicking outside content
+        window.addEventListener('click', (event) => {
+            if (event.target === loginModal) closeModal('login-modal');
+            if (event.target === productModal) closeModal('product-modal');
+            if (event.target === productDetailModal) closeModal('product-detail-modal');
+            if (event.target === messageBox) hideMessageBox();
+        });
+
+        // Initialize display for the first time
+        renderProducts();
+        renderAdminProducts();
+        updateAboutUsDisplay();
+        updateContactDisplay();
+        updateLogoDisplay();
+        applyStyles();
+    </script>
+</body>
+</html>
